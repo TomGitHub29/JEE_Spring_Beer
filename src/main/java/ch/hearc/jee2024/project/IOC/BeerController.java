@@ -2,6 +2,7 @@ package ch.hearc.jee2024.project.IOC;
 
 import ch.hearc.jee2024.project.BeerService.BeerService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,4 +81,30 @@ public class BeerController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Beer> deleteBeer(@PathVariable int id) {
+        try {
+            beerService.deleteBeer(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        }catch (IllegalArgumentException e) {
+            LOGGER.severe("Failed to delete beer: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<Page<Beer>> getBeersByPrice(
+            @RequestParam double maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            Page<Beer> beers = (Page<Beer>) beerService.getBeersByPriceLessThan(maxPrice, page, size);
+            return new ResponseEntity<>(beers, HttpStatus.OK);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to get beers by price: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+    }
 }

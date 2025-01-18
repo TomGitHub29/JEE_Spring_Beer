@@ -10,4 +10,5 @@ public interface IBeerService {
     List<Beer> getAllBeers();
     Optional<Beer> getBeerById(int id);
     Beer updateBeer(int id, Beer beer);
+    void deleteBeer(int id);
 }

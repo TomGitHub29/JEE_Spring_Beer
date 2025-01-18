@@ -1,6 +1,7 @@
 package ch.hearc.jee2024.project;
 
 import ch.hearc.jee2024.project.IOC.Beer;
+import ch.hearc.jee2024.project.IOC.Manufacturer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,8 +28,8 @@ public class BeerControllerTests {
 
     @Test
     public void createBeerShouldReturnCreatedBeer() throws Exception {
-        Beer beer = new Beer(null, "Pale Ale", "Ale", 5.5);
-
+        Manufacturer manufacturer = new Manufacturer("Feldschlösschen");
+        Beer beer = new Beer("BeerName", "BeerType", 5.0, manufacturer);
         // Convertir l'objet Beer en JSON
         String beerJson = objectMapper.writeValueAsString(beer);
 
