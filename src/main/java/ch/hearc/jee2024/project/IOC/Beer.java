@@ -1,27 +1,32 @@
 package ch.hearc.jee2024.project.IOC;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Beer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String type;
     private double price;
 
-    // Constructeurs, getters et setters
+    @ManyToOne
+    @JoinColumn(name = "manufacturer_id", nullable = false)
+    private Manufacturer manufacturer;
+
     public Beer() {}
 
-    public Beer(Long id, String name, String type, double price) {
-        this.id = id;
+    public Beer(String name, String type, double price, Manufacturer manufacturer) {
         this.name = name;
         this.type = type;
         this.price = price;
+        this.manufacturer = manufacturer;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -47,5 +52,14 @@ public class Beer {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public Manufacturer getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(Manufacturer manufacturer) {
+        this.manufacturer = manufacturer;
+    }
 }
+
 
