@@ -1,10 +1,9 @@
-package ch.hearc.jee2024.project.BeerService;
+package ch.hearc.jee2024.project.ServiceBeer;
 
 import ch.hearc.jee2024.project.IOC.Beer;
 import ch.hearc.jee2024.project.IOC.Manufacturer;
 import ch.hearc.jee2024.project.RepositoryBeer.IRepositoryBeer;
 import ch.hearc.jee2024.project.RepositoryManufacturer.IRepositoryManufacturer;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -46,6 +45,7 @@ public class BeerService implements IBeerService {
         beer.setName(beerDetails.getName());
         beer.setType(beerDetails.getType());
         beer.setPrice(beerDetails.getPrice());
+        beer.setManufacturer(beerDetails.getManufacturer());
         return beerRepository.save(beer);
     }
 

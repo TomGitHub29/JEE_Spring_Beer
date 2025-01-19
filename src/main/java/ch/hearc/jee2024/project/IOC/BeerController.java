@@ -1,6 +1,6 @@
 package ch.hearc.jee2024.project.IOC;
 
-import ch.hearc.jee2024.project.BeerService.BeerService;
+import ch.hearc.jee2024.project.ServiceBeer.BeerService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;

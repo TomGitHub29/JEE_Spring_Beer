@@ -1,4 +1,4 @@
-package ch.hearc.jee2024.project.ManufacturerService;
+package ch.hearc.jee2024.project.ServiceManufacturer;
 
 import ch.hearc.jee2024.project.IOC.Manufacturer;
 import ch.hearc.jee2024.project.RepositoryManufacturer.IRepositoryManufacturer;
