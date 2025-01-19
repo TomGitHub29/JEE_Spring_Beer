@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,7 +26,8 @@ public class BeerController {
         this.beerService = beerService;
     }
 
-    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin")
     public ResponseEntity<Beer> createBeer(@RequestBody Beer beer) {
         try {
             Beer createdBeer = beerService.createBeer(beer);
@@ -86,7 +88,8 @@ public class BeerController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/{id}")
     public ResponseEntity<Beer> updateBeer(@PathVariable int id, @RequestBody Beer beer) {
         try {
             Beer updatedBeer = beerService.updateBeer(id, beer);
@@ -100,7 +103,8 @@ public class BeerController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Beer> deleteBeer(@PathVariable int id) {
         try {
             beerService.deleteBeer(id);

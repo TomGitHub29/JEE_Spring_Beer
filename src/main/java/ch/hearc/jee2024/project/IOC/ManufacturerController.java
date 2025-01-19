@@ -3,6 +3,7 @@ package ch.hearc.jee2024.project.IOC;
 import ch.hearc.jee2024.project.ServiceManufacturer.ManufacturerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class ManufacturerController {
         this.manufacturerService = manufacturerService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Manufacturer> createManufacturer(@RequestBody Manufacturer manufacturer) {
         Manufacturer savedManu = manufacturerService.createManufacturer(manufacturer);
@@ -29,6 +31,7 @@ public class ManufacturerController {
         return manufacturerService.getAllManufacturers();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteManufacturer(@PathVariable Long id) {
         manufacturerService.deleteManufacturer(Math.toIntExact(id));
