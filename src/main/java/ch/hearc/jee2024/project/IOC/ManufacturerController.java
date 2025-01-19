@@ -1,9 +1,7 @@
 package ch.hearc.jee2024.project.IOC;
 
-import ch.hearc.jee2024.project.ManufacturerService.ManufacturerService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import ch.hearc.jee2024.project.ServiceManufacturer.ManufacturerService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,5 +27,11 @@ public class ManufacturerController {
     @GetMapping
     public List<Manufacturer> getAllManufacturers() {
         return manufacturerService.getAllManufacturers();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteManufacturer(@PathVariable Long id) {
+        manufacturerService.deleteManufacturer(Math.toIntExact(id));
+        return ResponseEntity.noContent().build();
     }
 }

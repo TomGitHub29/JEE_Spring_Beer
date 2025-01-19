@@ -1,4 +1,4 @@
-package ch.hearc.jee2024.project.BeerService;
+package ch.hearc.jee2024.project.ServiceBeer;
 
 import ch.hearc.jee2024.project.IOC.Beer;
 
