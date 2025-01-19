@@ -50,9 +50,9 @@ public class BeerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Beer>> getAllBeers() {
-        List<Beer> beers = beerService.getAllBeers();
-        return new ResponseEntity<>(beers, HttpStatus.OK);
+    public ResponseEntity<List<Beer>> findAllBeers() {
+        List<Beer> beers = beerService.findAll();
+        return ResponseEntity.ok(beers);
     }
 
     @GetMapping("/{id}")

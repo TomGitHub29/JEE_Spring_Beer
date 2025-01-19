@@ -2,6 +2,9 @@ package ch.hearc.jee2024.project.IOC;
 
 import ch.hearc.jee2024.project.ManufacturerService.ManufacturerService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +21,9 @@ public class ManufacturerController {
     }
 
     @PostMapping
-    public Manufacturer createManufacturer(@RequestBody Manufacturer manufacturer) {
-        return manufacturerService.createManufacturer(manufacturer);
+    public ResponseEntity<Manufacturer> createManufacturer(@RequestBody Manufacturer manufacturer) {
+        Manufacturer savedManu = manufacturerService.createManufacturer(manufacturer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedManu);
     }
 
     @GetMapping

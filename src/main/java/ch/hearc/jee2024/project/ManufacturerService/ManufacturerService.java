@@ -29,17 +29,26 @@ public class ManufacturerService implements IManufacturerService {
     }
 
     @Override
-    public Optional<Manufacturer> getManufacturerById(int id) {
-        return Optional.empty();
-    }
-
-    @Override
     public Manufacturer updateManufacturer(int id, Manufacturer manufacturer) {
-        return null;
+        Optional<Manufacturer> manufacturerToUpdate = manufacturerRepository.findById((long) id);
+        if (manufacturerToUpdate.isPresent()) {
+            Manufacturer updatedManufacturer = manufacturerToUpdate.get();
+            updatedManufacturer.setName(manufacturer.getName());
+            return manufacturerRepository.save(updatedManufacturer);
+        } else {
+            throw new IllegalArgumentException("Manufacturer with ID " + id + " does not exist.");
+        }
     }
 
     @Override
     public void deleteManufacturer(int id) {
-
+        this.manufacturerRepository.deleteById((long) id);
     }
+
+    @Override
+    public Optional<Manufacturer> getManufacturerById(int id) {
+        return manufacturerRepository.findById((long) id);
+    }
+
+
 }
