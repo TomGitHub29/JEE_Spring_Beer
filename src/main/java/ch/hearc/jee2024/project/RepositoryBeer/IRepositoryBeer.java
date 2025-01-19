@@ -12,9 +12,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 
-// Déclaration de l'interface IRepositoryBeer
 @Repository("beerRepository")
 public interface IRepositoryBeer extends PagingAndSortingRepository<Beer, Long>, CrudRepository<Beer, Long> {
 
     Page<Beer> findByPriceLessThan(double price, Pageable pageable);
+
+    Page<Beer> findByStockGreaterThan(int stock, Pageable pageable);
+
+    Page<Beer> findByPriceLessThanAndStockGreaterThan(double price, int stock, Pageable pageable);
 }

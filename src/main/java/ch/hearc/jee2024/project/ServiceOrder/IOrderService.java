@@ -2,6 +2,7 @@ package ch.hearc.jee2024.project.ServiceOrder;
 
 import ch.hearc.jee2024.project.IOC.Beer;
 import ch.hearc.jee2024.project.IOC.Order;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface IOrderService {
     List<Order> getAllOrders();
 
     Order addBeerToOrder(Long orderId, Long beerId);
-
     Order removeBeerFromOrder(Long orderId, Long beerId);
+
+    Page<Order> getOrders(int page, int size, String SortBy, String direction);
+
 }

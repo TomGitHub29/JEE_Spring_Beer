@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository("orderRepository")
-public interface IRepositoryOrder extends PagingAndSortingRepository<Order, Integer>, CrudRepository<Order, Integer> {
 
+@Repository("orderRepository")
+public interface IRepositoryOrder extends PagingAndSortingRepository<Order, Long>, CrudRepository<Order, Long> {
 }

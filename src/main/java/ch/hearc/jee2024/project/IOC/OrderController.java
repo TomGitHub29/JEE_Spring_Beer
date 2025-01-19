@@ -1,6 +1,7 @@
 package ch.hearc.jee2024.project.IOC;
 
 import ch.hearc.jee2024.project.ServiceOrder.OrderService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,8 +64,20 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<Order>> getAllOrders() {
+//        return ResponseEntity.ok(orderService.getAllOrders());
+//    }
+
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<Page<Order>> getOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "dateCreated") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Page<Order> orders = orderService.getOrders(page, size, sortBy, direction);
+        return ResponseEntity.ok(orders);
     }
 }
+

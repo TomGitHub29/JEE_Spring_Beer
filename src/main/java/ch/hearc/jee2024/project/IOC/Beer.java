@@ -14,7 +14,10 @@ public class Beer {
     private Long id;
     private String name;
     private String type;
+
+    @Column(name = "price", nullable = false)
     private double price;
+    private int stock;
 
     @ManyToOne
     @JoinColumn(name = "manufacturer_id", nullable = false)
@@ -22,10 +25,11 @@ public class Beer {
 
     public Beer() {}
 
-    public Beer(String name, String type, double price, Manufacturer manufacturer) {
+    public Beer(String name, String type, double price, int stock, Manufacturer manufacturer) {
         this.name = name;
         this.type = type;
         this.price = price;
+        this.stock = stock;
         this.manufacturer = manufacturer;
     }
 
@@ -60,6 +64,10 @@ public class Beer {
     public Manufacturer getManufacturer() {
         return manufacturer;
     }
+
+    public int getStock() {return stock;}
+
+    public void setStock(int stock) {this.stock = stock;}
 
     public void setManufacturer(Manufacturer manufacturer) {
         this.manufacturer = manufacturer;

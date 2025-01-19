@@ -1,7 +1,9 @@
 package ch.hearc.jee2024.project.IOC;
 
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class Order {
     )
     private List<Beer> beers = new ArrayList<>();
 
+    private LocalDate dateCreated;
+
     private double totalPrice;
 
     public void setId(Long id) {
@@ -32,7 +36,22 @@ public class Order {
     }
 
     public Order() {
+        this.dateCreated = LocalDate.now();
         this.totalPrice = 0.0;
+    }
+
+    public Order(List<Beer> beers){
+        this.beers = beers;
+        this.dateCreated = LocalDate.now();
+        recalculateTotalPrice();
+    }
+
+    public LocalDate getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDate dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public double getTotalPrice() {
