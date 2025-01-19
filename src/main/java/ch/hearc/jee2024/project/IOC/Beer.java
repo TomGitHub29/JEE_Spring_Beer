@@ -1,8 +1,12 @@
 package ch.hearc.jee2024.project.IOC;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "beer")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Beer.class)
 public class Beer {
 
     @Id

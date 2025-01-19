@@ -1,7 +1,9 @@
 package ch.hearc.jee2024.project.BeerService;
 
 import ch.hearc.jee2024.project.IOC.Beer;
+import ch.hearc.jee2024.project.IOC.Manufacturer;
 import ch.hearc.jee2024.project.RepositoryBeer.IRepositoryBeer;
+import ch.hearc.jee2024.project.RepositoryManufacturer.IRepositoryManufacturer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,18 +16,23 @@ import java.util.Optional;
 public class BeerService implements IBeerService {
 
     private final IRepositoryBeer beerRepository;
+    private final IRepositoryManufacturer manufacturerRepository;
 
-    public BeerService(@Qualifier("beerRepository") IRepositoryBeer beerRepository) {
+    public BeerService(IRepositoryBeer beerRepository, IRepositoryManufacturer manufacturerRepository) {
         this.beerRepository = beerRepository;
+        this.manufacturerRepository = manufacturerRepository;
     }
 
-    @Override
     public Beer createBeer(Beer beer) {
+        if (beer.getManufacturer() != null && beer.getManufacturer().getId() == null) {
+            Manufacturer manufacturer = manufacturerRepository.save(beer.getManufacturer());
+            beer.setManufacturer(manufacturer);
+        }
         return beerRepository.save(beer);
     }
 
     @Override
-    public List<Beer> getAllBeers() {
+    public List<Beer> findAll() {
         return (List<Beer>) beerRepository.findAll();
     }
 
@@ -34,26 +41,19 @@ public class BeerService implements IBeerService {
         return beerRepository.findById((long) id);
     }
 
-    @Override
-    public Beer updateBeer(int id, Beer beer) {
-        Optional<Beer> beerToUpdate = beerRepository.findById((long) id);
-        if (beerToUpdate.isPresent()) {
-            Beer updatedBeer = beerToUpdate.get();
-            updatedBeer.setName(beer.getName());
-            updatedBeer.setType(beer.getType());
-            updatedBeer.setPrice(beer.getPrice());
-            return beerRepository.save(updatedBeer);
-        } else {
-            throw new IllegalArgumentException("Beer with ID " + id + " does not exist.");
-        }
+    public Beer updateBeer(int id, Beer beerDetails) {
+        Beer beer = beerRepository.findById((long)id).orElseThrow(() -> new IllegalArgumentException("Beer not found"));
+        beer.setName(beerDetails.getName());
+        beer.setType(beerDetails.getType());
+        beer.setPrice(beerDetails.getPrice());
+        return beerRepository.save(beer);
     }
 
-    @Override
     public void deleteBeer(int id) {
-        beerRepository.deleteById((long) id);
+        Beer beer = beerRepository.findById((long)id).orElseThrow(() -> new IllegalArgumentException("Beer not found"));
+        beerRepository.delete(beer);
     }
-
-    public List<Beer> getBeersByPriceLessThan(double price, int page, int size) {
+    public Page<Beer> getBeersByPriceLessThan(double price, int page, int size) {
         return beerRepository.findByPriceLessThan(price, PageRequest.of(page, size));
     }
 }
