@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.2.0-oracle
+    container_name: vivone_beer_mysql
+    environment:
+      MYSQL_DATABASE: beer_store
+      MYSQL_ROOT_PASSWORD: beers
+    ports:
+      - "3306:3306"

@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Rapport du Projet : Magasin de Bières}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{png_He-arc.png}
+    \label{fig:enter-label}
+\end{figure}
+\author{Tom Vivone}
+\date{Janvier 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Le projet consiste en la création d'une application web de gestion d'un magasin de bières.
+L'application est construite en utilisant Spring Boot et expose une API REST permettant la gestion des bières, des commandes et des fabricants.
+
+\section{Cahier des Charges}
+
+\subsection{Description du projet}
+Le but de ce projet est de permettre aux utilisateurs de consulter le catalogue des bières, de gérer leurs commandes et aux administrateurs d'ajouter de nouvelles bières ainsi que de gérer les fabricants.
+
+\subsection{Fonctionnalités}
+\begin{itemize}
+    \item Consultation des bières avec pagination et tri.
+    \item Création et gestion des commandes.
+    \item Gestion des fabricants.
+    \item Authentification basique avec distinction entre utilisateurs et administrateurs (Basic Auth de Spring).
+    \item Tests unitaires des principales fonctionnalités.
+\end{itemize}
+
+\section{Conception}
+
+\subsection{Diagramme de base de données}
+Un diagramme représentant la structure des tables et leurs relations sera inclus ici.
+
+\subsection{Liste des routes}
+Il est important de noter à ce moment là que pour toutes routes non-admin, il est tout de même nécessaire d'entrer des identifiants du profil "USER" qui sont 
+"\textbf{user}" : "\textbf{password}"
+et pour le profil "ADMIN" :  "\textbf{admin}" : "\textbf{admin123}".
+\begin{itemize}
+    \item \textbf{Beer Controller}
+        \begin{itemize}
+            \item GET /beers
+            \item POST /beers/admin (nécessite un compte admin)
+            \item DELETE /beers/admin/{id} (nécessite un compte admin)
+        \end{itemize}
+    \item \textbf{Order Controller}
+        \begin{itemize}
+            \item POST /orders
+            \item GET /orders
+            \item POST /orders/{orderId}/addBeer/{beerId}
+            \item DELETE /orders/{orderId}/removeBeer/{beerId}
+        \end{itemize}
+    \item \textbf{Manufacturer Controller}
+        \begin{itemize}
+            \item POST /manufacturers
+            \item GET /manufacturers
+        \end{itemize}
+\end{itemize}
+
+\section{Implémentation}
+
+\subsection{Architecture logicielle}
+L'application suit une architecture MVC avec séparation en couches :
+\begin{itemize}
+    \item \textbf{Controller} : Gère les routes et les requêtes utilisateurs.
+    \item \textbf{Service} : Contient la logique métier et interagit avec la base de données.
+    \item \textbf{Repository} : Fournit une abstraction pour les opérations sur la base de données.
+\end{itemize}
+
+\subsection{Authentification}
+L'authentification est gérée via Spring Security avec une approche simplifiée de stockage en mémoire.
+Les utilisateurs sont soit \textbf{USER} soit \textbf{ADMIN} et certaines routes sont protégées en conséquence.
+
+\section{Conclusion}
+
+\subsection{Problèmes rencontrés et solutions}
+\begin{itemize}
+    \item Gestion des relations entre entités (ex: liaison entre commandes et bières).
+    \item Configuration de Docker pour la base de données MySQL.
+    \item Problèmes d'authentification corrigés en ajustant la configuration de Spring Security.
+\end{itemize}
+
+\subsection{Bilan et perspectives}
+\begin{itemize}
+    \item Les fonctionnalités principales ont été implémentées avec succès.
+    \item Possibilité d'ajouter une interface graphique pour améliorer l'expérience utilisateur.
+    \item Sécurisation avancée avec OAuth2 ou JWT pourrait être explorée.
+\end{itemize}
+
+\section{Guide d'installation et d'exécution}
+\begin{enumerate}
+    \item Cloner le repository Git : \texttt{git clone <repo-url>}
+    \item Lancer l'installation : \texttt{mvn clean install}
+    \item Démarrer l'application : \texttt{mvn spring-boot:run}
+\end{enumerate}
+
+\end{document}
