@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,7 +26,8 @@ public class BeerController {
         this.beerService = beerService;
     }
 
-    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin")
     public ResponseEntity<Beer> createBeer(@RequestBody Beer beer) {
         try {
             Beer createdBeer = beerService.createBeer(beer);
@@ -50,10 +52,29 @@ public class BeerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Beer>> findAllBeers() {
-        List<Beer> beers = beerService.findAll();
+    public ResponseEntity<List<Beer>> getBeers() {
+        try {
+            List<Beer> beers = beerService.findAll();
+            return new ResponseEntity<>(beers, HttpStatus.OK);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to get beers: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Beer>> getFilteredBeers(
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Page<Beer> beers = beerService.getFilteredBeers(maxPrice, minStock, page, size, sortBy, direction);
         return ResponseEntity.ok(beers);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Beer> getBeerById(@PathVariable int id) {
@@ -67,7 +88,8 @@ public class BeerController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/{id}")
     public ResponseEntity<Beer> updateBeer(@PathVariable int id, @RequestBody Beer beer) {
         try {
             Beer updatedBeer = beerService.updateBeer(id, beer);
@@ -81,7 +103,8 @@ public class BeerController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Beer> deleteBeer(@PathVariable int id) {
         try {
             beerService.deleteBeer(id);
@@ -93,18 +116,4 @@ public class BeerController {
         }
     }
 
-    @GetMapping("/price")
-    public ResponseEntity<Page<Beer>> getBeersByPrice(
-            @RequestParam double maxPrice,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        try {
-            Page<Beer> beers = (Page<Beer>) beerService.getBeersByPriceLessThan(maxPrice, page, size);
-            return new ResponseEntity<>(beers, HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.severe("Failed to get beers by price: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-
-    }
 }

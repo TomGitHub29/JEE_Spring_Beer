@@ -5,8 +5,13 @@ import ch.hearc.jee2024.project.IOC.Order;
 import ch.hearc.jee2024.project.RepositoryBeer.IRepositoryBeer;
 import ch.hearc.jee2024.project.RepositoryOrder.IRepositoryOrder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,12 +32,12 @@ public class OrderService implements IOrderService {
 
     @Override
     public Optional<Order> getOrderById(Long id) {
-        return orderRepository.findById(Math.toIntExact(id));
+        return orderRepository.findById(id);
     }
 
     @Override
     public void deleteOrder(Long id) {
-        orderRepository.deleteById(Math.toIntExact(id));
+        orderRepository.deleteById(id);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order addBeerToOrder(Long orderId, Long beerId) {
-        Optional<Order> orderOpt = orderRepository.findById(Math.toIntExact(orderId));
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
         Optional<Beer> beerOpt = beerRepository.findById(beerId);
 
         if (orderOpt.isPresent() && beerOpt.isPresent()) {
@@ -57,7 +62,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order removeBeerFromOrder(Long orderId, Long beerId) {
-        Optional<Order> orderOpt = orderRepository.findById(Math.toIntExact(orderId));
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
         Optional<Beer> beerOpt = beerRepository.findById(beerId);
 
         if (orderOpt.isPresent() && beerOpt.isPresent()) {
@@ -70,5 +75,13 @@ public class OrderService implements IOrderService {
             throw new IllegalArgumentException("Order or Beer not found");
         }
     }
+
+    @Override
+    public Page<Order> getOrders(int page, int size, String sortBy, String direction){
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.findAll(pageable);
+    }
+
 
 }
