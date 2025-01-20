@@ -22,5 +22,4 @@ public interface IOrderService {
     Order removeBeerFromOrder(Long orderId, Long beerId);
 
     Page<Order> getOrders(int page, int size, String SortBy, String direction);
-
 }
