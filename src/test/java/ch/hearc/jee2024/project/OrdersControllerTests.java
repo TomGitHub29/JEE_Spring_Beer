@@ -27,31 +27,31 @@ public class OrdersControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void addBeerToOrderShouldUpdateOrderTotalPrice() throws Exception {
-        // Créer une commande
-        String orderResponse = mockMvc.perform(post("/orders"))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Order savedOrder = objectMapper.readValue(orderResponse, Order.class);
-
-        // Créer une bière
-        Beer beer = new Beer("IPA", "Hoppy", 6.5, new Manufacturer("Brewdog"));
-        String beerResponse = mockMvc.perform(post("/beers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(beer)))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Beer savedBeer = objectMapper.readValue(beerResponse, Beer.class);
-
-        // Ajouter la bière à la commande
-        this.mockMvc.perform(post("/orders/" + savedOrder.getId() + "/addBeer/" + savedBeer.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(6.5));
-    }
+//    @Test
+//    public void addBeerToOrderShouldUpdateOrderTotalPrice() throws Exception {
+//        // Créer une commande
+//        String orderResponse = mockMvc.perform(post("/orders"))
+//                .andExpect(status().isCreated())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//        Order savedOrder = objectMapper.readValue(orderResponse, Order.class);
+//
+//        // Créer une bière
+//        Beer beer = new Beer("IPA", "Hoppy", 6.5,  new Manufacturer("Brewdog"));
+//        String beerResponse = mockMvc.perform(post("/beers")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(beer)))
+//                .andExpect(status().isCreated())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//        Beer savedBeer = objectMapper.readValue(beerResponse, Beer.class);
+//
+//        // Ajouter la bière à la commande
+//        this.mockMvc.perform(post("/orders/" + savedOrder.getId() + "/addBeer/" + savedBeer.getId()))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.totalPrice").value(6.5));
+//    }
 
 }

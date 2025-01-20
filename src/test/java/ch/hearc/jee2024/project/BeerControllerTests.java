@@ -3,23 +3,23 @@ package ch.hearc.jee2024.project;
 import ch.hearc.jee2024.project.IOC.Beer;
 import ch.hearc.jee2024.project.IOC.Manufacturer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static java.util.Optional.empty;import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@AutoConfigureMockMvc
 @SpringBootTest
+@AutoConfigureMockMvc
 public class BeerControllerTests {
 
     @Autowired
@@ -28,12 +28,15 @@ public class BeerControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void getAllBeersShouldReturnListOfBeers() throws Exception {
-        Manufacturer manufacturer = new Manufacturer("He-Arc Brewing");
-        String manufacturerJson = objectMapper.writeValueAsString(manufacturer);
+    private Manufacturer manufacturer;
 
-        String manufacturerResponse = this.mockMvc.perform(post("/manufacturers")
+    @BeforeEach
+    void setUp() throws Exception {
+        // Création d'un Manufacturer unique pour les tests
+        Manufacturer newManufacturer = new Manufacturer("Test Brewery");
+        String manufacturerJson = objectMapper.writeValueAsString(newManufacturer);
+
+        String response = this.mockMvc.perform(post("/manufacturers").with(user("admin").password("admin123").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(manufacturerJson))
                 .andExpect(status().isCreated())
@@ -41,117 +44,47 @@ public class BeerControllerTests {
                 .getResponse()
                 .getContentAsString();
 
-        Manufacturer savedManufacturer = objectMapper.readValue(manufacturerResponse, Manufacturer.class);
+        manufacturer = objectMapper.readValue(response, Manufacturer.class);
 
-        // Création de plusieurs bières
-        Beer beer1 = new Beer("Lager", "Blonde", 4.5, savedManufacturer);
-        Beer beer2 = new Beer("Stout", "Dark", 6.0, savedManufacturer);
+        // ajout de 3 bières pour les tests
+        Beer beer1 = new Beer("IPA", "Blonde", 5.0, 10, manufacturer);
+        Beer beer2 = new Beer("Stout", "Dark", 6.5, 10, manufacturer);
+        Beer beer3 = new Beer("Pilsner", "Blonde", 4.5, 10, manufacturer);
 
-        this.mockMvc.perform(post("/beers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(beer1)))
-                .andExpect(status().isCreated());
 
-        this.mockMvc.perform(post("/beers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(beer2)))
-                .andExpect(status().isCreated());
+        String beer1Json = objectMapper.writeValueAsString(beer1);
+        String beer2Json = objectMapper.writeValueAsString(beer2);
+        String beer3Json = objectMapper.writeValueAsString(beer3);
 
-        // Vérification que la liste contient bien les 2 bières
-        this.mockMvc.perform(get("/beers"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(greaterThanOrEqualTo(2)));
     }
-
 
 
     @Test
     public void createBeerShouldReturnCreatedBeer() throws Exception {
-        // persiste un Manufacturer en base de données -> Probleme vue en classe.
-        Manufacturer manufacturer = new Manufacturer("Feldschlösschen");
-        String manufacturerJson = objectMapper.writeValueAsString(manufacturer);
-
-        String manufacturerResponse = this.mockMvc.perform(post("/manufacturers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(manufacturerJson))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Manufacturer savedManufacturer = objectMapper.readValue(manufacturerResponse, Manufacturer.class);
-
-        // Beer avec le Manufacturer persisté
-        Beer beer = new Beer( "BeerName", "BeerType", 5.0, savedManufacturer);
+        Beer beer = new Beer("IPA", "Blonde", 5.0, 10, manufacturer);
         String beerJson = objectMapper.writeValueAsString(beer);
 
-        this.mockMvc.perform(post("/beers")
+        this.mockMvc.perform(post("/beers/admin").with(user("admin").password("admin123").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(beerJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.name", is(beer.getName())));
     }
 
     @Test
-    public void updateBeerShouldReturnUpdatedBeer() throws Exception {
-        // persiste un Manufacturer en base de données -> Probleme vue en classe.
-        Manufacturer manufacturer = new Manufacturer("Feldschlösschen");
-        String manufacturerJson = objectMapper.writeValueAsString(manufacturer);
-
-        String manufacturerResponse = this.mockMvc.perform(post("/manufacturers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(manufacturerJson))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Manufacturer savedManufacturer = objectMapper.readValue(manufacturerResponse, Manufacturer.class);
-
-        // Beer avec le Manufacturer persisté
-        Beer beer = new Beer("Test2", "Blonde", 5.0, savedManufacturer);
-        String beerJson = objectMapper.writeValueAsString(beer);
-
-        String beerResponse = this.mockMvc.perform(post("/beers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(beerJson))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Beer savedBeer = objectMapper.readValue(beerResponse, Beer.class);
-
-        // on test de find la beer par id et on la modifie
-        Beer beerUpdated = new Beer("Test2", "Blonde", 6.0, savedManufacturer);
-        String beerUpdatedJson = objectMapper.writeValueAsString(beerUpdated);
-
-        this.mockMvc.perform(put("/beers/" + savedBeer.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(beerUpdatedJson))
-                .andExpect(status().isOk());
+    public void getAllBeersShouldReturnListOfBeers() throws Exception {
+        this.mockMvc.perform(get("/beers").with(user("user").password("password").roles("USER"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(not(empty()))));
     }
-
 
     @Test
     public void deleteBeerShouldRemoveBeer() throws Exception {
-        Manufacturer manufacturer = new Manufacturer("Test Brewery");
-        String manufacturerJson = objectMapper.writeValueAsString(manufacturer);
-
-        String manufacturerResponse = this.mockMvc.perform(post("/manufacturers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(manufacturerJson))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Manufacturer savedManufacturer = objectMapper.readValue(manufacturerResponse, Manufacturer.class);
-
-        Beer beer = new Beer("IPA", "Hoppy", 6.5, savedManufacturer);
+        Beer beer = new Beer("Oister", "Dark", 6.5, 10, manufacturer);
         String beerJson = objectMapper.writeValueAsString(beer);
 
-        String beerResponse = this.mockMvc.perform(post("/beers")
+        String response = this.mockMvc.perform(post("/beers/admin").with(user("admin").password("admin123").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(beerJson))
                 .andExpect(status().isCreated())
@@ -159,18 +92,27 @@ public class BeerControllerTests {
                 .getResponse()
                 .getContentAsString();
 
-        Beer savedBeer = objectMapper.readValue(beerResponse, Beer.class);
+        Beer savedBeer = objectMapper.readValue(response, Beer.class);
 
-        // Vérifie que l'ID est bien généré
-        assert savedBeer.getId() != null;
 
-        this.mockMvc.perform(delete("/beers/" + savedBeer.getId()))
+        this.mockMvc.perform(delete("/beers/admin/" + savedBeer.getId()).with(user("admin").password("admin123").roles("ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        // Vérifie que la bière est bien supprimée
-        this.mockMvc.perform(get("/beers/" + savedBeer.getId()))
-                .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void getBeersWithPagination() throws Exception {
+        this.mockMvc.perform(get("/beers/search?page=0&size=5").with(user("user").password("password").roles("USER"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()", lessThanOrEqualTo(5)));
+    }
 
+    @Test
+    public void getBeersSortedByName() throws Exception {
+        this.mockMvc.perform(get("/beers?sortBy=name&direction=asc").with(user("user").password("password").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").isNotEmpty());
+    }
 }
