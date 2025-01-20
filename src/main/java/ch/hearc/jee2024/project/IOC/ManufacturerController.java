@@ -32,7 +32,7 @@ public class ManufacturerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Void> deleteManufacturer(@PathVariable Long id) {
         manufacturerService.deleteManufacturer(Math.toIntExact(id));
         return ResponseEntity.noContent().build();
