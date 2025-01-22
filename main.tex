@@ -1,0 +1,204 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{float}
+
+\title{Rapport : Magasin de Bières}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{image.png}
+    \label{fig:enter-label}
+\end{figure}
+\author{Tom Vivone \and Enseignant : M. Chèvre Sébastien Gérard Henri}
+\date{Janvier 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Le projet consiste en la création d'une application web de gestion d'un magasin de bières.
+L'application est construite en utilisant Spring Boot et expose une API REST permettant la gestion des bières, des commandes et des fabricants.
+
+\section{Cahier des Charges}
+
+\subsection{Description du projet}
+Le but de ce projet est de permettre aux utilisateurs de consulter le catalogue des bières, de gérer leurs commandes et aux administrateurs d'ajouter de nouvelles bières ainsi que de gérer les fabricants.
+
+\subsection{Fonctionnalités}
+\begin{itemize}
+    \item \textbf{Consultation des bières} : possibilité de rechercher des bières par nom, type, prix et stock disponible.
+    \item \textbf{Pagination et tri} : affichage paginé des bières avec tri possible sur différents critères (prix, nom, stock).
+    \item \textbf{Filtres avancés} : possibilité de filtrer les bières par prix maximal, stock minimal et type de bière.
+    \item \textbf{Création et gestion des commandes} : ajout et suppression de bières dans une commande, consultation des commandes existantes.
+    \item \textbf{Gestion des fabricants} : création, suppression et consultation des fabricants de bières.
+    \item \textbf{Authentification basique} : distinction entre utilisateurs (lecture seule) et administrateurs (ajout, modification et suppression de bières et fabricants) via Basic Auth de Spring.
+    \item \textbf{Tests unitaires} : validation des principales fonctionnalités pour assurer la stabilité du système.
+\end{itemize}
+
+\section{Conception}
+\subsection{Diagramme de base de données}
+   \begin{figure}[hbt!]
+        \centering
+        \vspace{}
+        \includegraphics[width=0.5\linewidth ]{schema.png}
+        \caption{Schéma relationnel}
+        \label{fig:enter-label}
+    \end{figure}
+\subsection{Liste des routes}
+Il est important de noter à ce moment-là que pour toutes routes non-admin, il est tout de même nécessaire d'entrer des identifiants du profil "USER" qui sont
+"\textbf{user}" : "\textbf{password}"
+et pour le profil "ADMIN" :  "\textbf{admin}" : "\textbf{admin123}".
+
+\begin{itemize}
+    \item \textbf{Beer Controller}
+        \begin{itemize}
+            \item \textbf{GET /beers} : Récupérer toutes les bières.
+            \item \textbf{GET /beers/{id}} : Récupérer une bière par son ID.
+            \item \textbf{GET /beers/search} : Rechercher des bières avec filtres (prix, stock, tri). Utilisation :
+                  \begin{itemize}
+                      \item \textbf{Filtres disponibles} : \texttt{maxPrice}, \texttt{minStock}, \texttt{type}
+                      \item \textbf{Tri et pagination} : \texttt{page}, \texttt{size}, \texttt{sortBy}, \texttt{direction}
+                  \end{itemize}
+            \item \textbf{POST /beers/admin} : Ajouter une nouvelle bière (admin uniquement).
+            \item \textbf{PUT /beers/admin/{id}} : Modifier une bière existante (admin uniquement).
+            \item \textbf{DELETE /beers/admin/{id}} : Supprimer une bière (admin uniquement).
+        \end{itemize}
+    \item \textbf{Order Controller}
+        \begin{itemize}
+            \item \textbf{POST /orders} : Créer une nouvelle commande.
+            \item \textbf{GET /orders} : Récupérer la liste des commandes avec pagination et tri par date.
+            \item \textbf{GET /orders/{id}} : Récupérer une commande spécifique par son ID.
+            \item \textbf{POST /orders/{orderId}/addBeer/{beerId}} : Ajouter une bière à une commande.
+            \item \textbf{DELETE /orders/{orderId}/removeBeer/{beerId}} : Supprimer une bière d'une commande.
+            \item \textbf{DELETE /orders/{id}/checkout} : Valider et supprimer une commande après paiement.
+        \end{itemize}
+    \item \textbf{Manufacturer Controller}
+        \begin{itemize}
+            \item \textbf{POST /manufacturers} : Ajouter un nouveau fabricant (admin uniquement).
+            \item \textbf{GET /manufacturers} : Récupérer la liste des fabricants.
+            \item \textbf{DELETE /manufacturers/admin/{id}} : Supprimer un fabricant (admin uniquement).
+        \end{itemize}
+\end{itemize}
+
+\section{Implémentation}
+
+\subsection{Architecture logicielle}
+L'application suit une architecture MVC avec séparation en couches :
+\begin{itemize}
+    \item \textbf{Controller} : Gère les routes et les requêtes utilisateurs.
+    \item \textbf{Service} : Contient la logique métier et interagit avec la base de données.
+    \item \textbf{Repository} : Fournit une abstraction pour les opérations sur la base de données.
+\end{itemize}
+
+
+\subsection{Pagination et filtres}
+Les paramètres disponibles pour la pagination et les filtres sont :
+\begin{itemize}
+    \item \textbf{page} : numéro de la page à récupérer (commence à 0).
+    \item \textbf{size} : nombre d'éléments par page.
+    \item \textbf{sortBy} : champ utilisé pour le tri (\texttt{name}, \texttt{price}, \texttt{stock}, etc.).
+    \item \textbf{direction} : ordre du tri (\texttt{asc} pour ascendant, \texttt{desc} pour descendant).
+    \item \textbf{maxPrice} : filtre pour récupérer uniquement les bières dont le prix est inférieur ou égal à cette valeur.
+    \item \textbf{minStock} : filtre pour récupérer uniquement les bières ayant un stock minimum défini.
+    \item \textbf{type} : filtre pour récupérer uniquement les bières d'un certain type (ex: \texttt{Blonde}, \texttt{Brune}, etc.).
+\end{itemize}
+
+Exemple d'utilisation pour récupérer les bières triées par prix et paginées :
+\begin{verbatim}
+GET /beers/search?page=0&size=10&sortBy=price&direction=asc&maxPrice=5
+\end{verbatim}
+
+\subsection{Sécurité et Authentification}
+L'authentification est gérée via Spring Security avec une approche simplifiée de stockage en mémoire.
+Les utilisateurs sont soit \textbf{USER} soit \textbf{ADMIN}, et certaines routes sont protégées en conséquence.
+
+Spring Security utilise ici un mécanisme de Basic Authentication, où les utilisateurs et administrateurs sont définis directement dans la configuration via la classe \textbf{SecurityConfig}.
+
+\subsubsection{Configuration de Spring Security}
+Le projet implémente la sécurité en définissant un fichier de configuration spécifique :
+\begin{itemize}
+    \item \textbf{Définition des utilisateurs} : Deux utilisateurs sont créés en mémoire, avec des mots de passe hashés en utilisant \texttt{BCryptPasswordEncoder}.
+    \item \textbf{Filtrage des accès} : L'accès aux routes est restreint selon le rôle \texttt{USER} ou \texttt{ADMIN}.
+    \item \textbf{Désactivation du CSRF} : Comme il s'agit d'une API REST, la protection CSRF est désactivée.
+\end{itemize}
+
+Exemple de configuration dans \texttt{SecurityConfig} :
+\begin{verbatim}
+@Bean
+public UserDetailsService userDetailsService() {
+    UserDetails user = User.builder()
+            .username("user")
+            .password(passwordEncoder().encode("password"))
+            .roles("USER")
+            .build();
+    UserDetails admin = User.builder()
+            .username("admin")
+            .password(passwordEncoder().encode("admin123"))
+            .roles("ADMIN")
+            .build();
+    return new InMemoryUserDetailsManager(user, admin);
+}
+\end{verbatim}
+
+\subsection{Utilisation de Docker}
+Pour simplifier la gestion de la base de données MySQL, un fichier \texttt{docker-compose.yaml} est utilisé pour déployer les services nécessaires.
+
+\subsubsection{Fichier docker-compose.yaml}
+\begin{verbatim}
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.2.0-oracle
+    container_name: vivone_beer_mysql
+    environment:
+      MYSQL_DATABASE: beer_store
+      MYSQL_ROOT_PASSWORD: beers
+    ports:
+      - "3306:3306"
+\end{verbatim}
+
+\subsubsection{Démarrage de la base de données avec Docker}
+\begin{enumerate}
+    \item Se positionner dans le répertoire contenant \texttt{docker-compose.yaml}.
+    \item Lancer la base de données avec :
+    \begin{verbatim}
+    docker-compose up -d
+    \end{verbatim}
+    \item Vérifier que le container est bien lancé avec :
+    \begin{verbatim}
+    docker ps
+    \end{verbatim}
+    \item L'application Spring Boot peut ensuite être démarrée normalement.
+\end{enumerate}
+\clearpage
+\section{Conclusion}
+
+\subsection{Problèmes rencontrés et solutions}
+\begin{itemize}
+    \item Configuration de Docker pour la base de données MySQL.
+            \begin{itemize}
+                \item Utilisation d'un docker-compose.yaml
+            \end{itemize}
+    \item Problèmes d'authentification corrigés en ajustant la configuration de Spring Security.
+            \begin{itemize}
+                \item Gestion des utilisateurs en mémoire avec \texttt{InMemoryUserDetailsManager}.
+            \end{itemize}
+\end{itemize}
+
+\subsection{Bilan et perspectives}
+\begin{itemize}
+    \item Les fonctionnalités principales ont été implémentées avec succès.
+    \item Possibilité d'ajouter une interface graphique pour améliorer l'expérience utilisateur.
+    \item Sécurisation avancée avec OAuth2 ou JWT pourrait être explorée.
+\end{itemize}
+
+\section{Références}
+\begin{itemize}
+    \item\textbf{Spring Boot — Securing API with basic authentication le 20.01.2025 :} https://medium.com/javarevisited/spring-boot-securing-api-with-basic-authentication-bdd3ad2266f5
+    \item\textbf{Désactivation du CSRF pour l'authentification de Spring Security le 20.01.2025} : https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html
+\end{itemize}
+
+\end{document}

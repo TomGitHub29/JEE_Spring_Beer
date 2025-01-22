@@ -55,7 +55,6 @@ public class BeerControllerTests {
         String beer1Json = objectMapper.writeValueAsString(beer1);
         String beer2Json = objectMapper.writeValueAsString(beer2);
         String beer3Json = objectMapper.writeValueAsString(beer3);
-
     }
 
 
