@@ -37,4 +37,25 @@ public class ManufacturerController {
         manufacturerService.deleteManufacturer(Math.toIntExact(id));
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<Manufacturer> updateManufacturer(@PathVariable Long id, @RequestBody Manufacturer manufacturer) {
+        try {
+            Manufacturer updatedManufacturer = manufacturerService.updateManufacturer(Math.toIntExact(id), manufacturer);
+            return ResponseEntity.ok(updatedManufacturer);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Manufacturer> getManufacturerById(@PathVariable Long id) {
+       try {
+           Manufacturer manufacturer = manufacturerService.getManufacturerById(Math.toIntExact(id)).orElseThrow();
+           return ResponseEntity.ok(manufacturer);
+       } catch (Exception e) {
+           return ResponseEntity.notFound().build();
+       }
+    }
 }

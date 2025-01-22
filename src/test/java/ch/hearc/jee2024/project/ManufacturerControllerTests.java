@@ -56,6 +56,15 @@ public class ManufacturerControllerTests {
     }
 
     @Test
+    public void getManufacturerByIdShouldReturnManufacturer() throws Exception {
+        this.mockMvc.perform(get("/manufacturers/" + manufacturer.getId()).with(user("user").password("password").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(manufacturer.getId().intValue())))
+                .andExpect(jsonPath("$.name", is(manufacturer.getName())));
+    }
+
+    @Test
     public void getAllManufacturersShouldReturnList() throws Exception {
         this.mockMvc.perform(get("/manufacturers").with(user("user").password("password").roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON))

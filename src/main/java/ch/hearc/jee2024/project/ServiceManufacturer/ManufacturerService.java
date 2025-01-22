@@ -42,13 +42,20 @@ public class ManufacturerService implements IManufacturerService {
 
     @Override
     public void deleteManufacturer(int id) {
-        this.manufacturerRepository.deleteById((long) id);
+        try {
+            this.manufacturerRepository.deleteById((long) id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting manufacturer with ID " + id, e);
+        }
     }
 
     @Override
     public Optional<Manufacturer> getManufacturerById(int id) {
-        return manufacturerRepository.findById((long) id);
-    }
+        try {
+            return manufacturerRepository.findById((long) id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving manufacturer with ID " + id, e);
+        }    }
 
 
 }

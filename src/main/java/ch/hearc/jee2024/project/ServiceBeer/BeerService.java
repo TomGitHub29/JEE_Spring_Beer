@@ -63,10 +63,14 @@ public class BeerService implements IBeerService {
 
     public Page<Beer> getFilteredBeers(Integer maxPrice, Integer minStock, int page, int size, String sortBy, String direction) {
         Sort sort = Sort.by(Sort.Order.by(sortBy));
-        if (direction.equalsIgnoreCase("desc")) {
-            sort = sort.descending();
-        }
 
+        if (direction != null) {
+            if (direction.equalsIgnoreCase("desc")) {
+                sort = sort.descending();
+            } else if (!direction.equalsIgnoreCase("asc")) {
+                throw new IllegalArgumentException("Invalid sort direction: " + direction);
+            }
+        }
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // Cas 1 : Filtre sur le prix uniquement

@@ -71,8 +71,13 @@ public class BeerController {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        Page<Beer> beers = beerService.getFilteredBeers(maxPrice, minStock, page, size, sortBy, direction);
-        return ResponseEntity.ok(beers);
+        try {
+            Page<Beer> beers = beerService.getFilteredBeers(maxPrice, minStock, page, size, sortBy, direction);
+            return ResponseEntity.ok(beers);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to get filtered beers: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
 
