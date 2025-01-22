@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .roles("ADMIN")
                 .build();
 
+        // Spring Security, InMemoryUserDetailsManager qui permet de stocker les utilisateurs en mémoire
         return new InMemoryUserDetailsManager(user, admin);
     }
 
