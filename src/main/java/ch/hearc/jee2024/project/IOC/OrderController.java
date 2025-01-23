@@ -1,6 +1,7 @@
 package ch.hearc.jee2024.project.IOC;
 
 import ch.hearc.jee2024.project.ServiceOrder.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @Operation(summary = "Créer une nouvelle commande", description = "Crée une nouvelle commande vide.")
     @PostMapping
     public ResponseEntity<Order> createOrder() {
         try {
@@ -30,6 +32,7 @@ public class OrderController {
 
     }
 
+    @Operation(summary = "Obtenir une commande", description = "Retourne une commande enregistrée.")
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id)
@@ -37,6 +40,7 @@ public class OrderController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Ajouter une bière à une commande", description = "Ajoute une bière à une commande existante.")
     @PostMapping("/{orderId}/addBeer/{beerId}")
     public ResponseEntity<Order> addBeerToOrder(@PathVariable Long orderId, @PathVariable Long beerId) {
         try {
@@ -47,6 +51,7 @@ public class OrderController {
         }
     }
 
+    @Operation(summary = "Supprimer une bière d'une commande", description = "Supprime une bière d'une commande existante.")
     @DeleteMapping("/{orderId}/removeBeer/{beerId}")
     public ResponseEntity<Order> removeBeerFromOrder(@PathVariable Long orderId, @PathVariable Long beerId) {
         try {
@@ -57,7 +62,7 @@ public class OrderController {
         }
     }
 
-
+    @Operation(summary = "Obtenir toutes les bières d'une commande", description = "Retourne la liste des bières d'une commande.")
     @DeleteMapping("/{id}/checkout")
     public ResponseEntity<Double> deleteOrder(@PathVariable Long id) {
         Order order = orderService.getOrderById(id).orElse(null);
@@ -69,7 +74,7 @@ public class OrderController {
         }
     }
 
-
+    @Operation(summary = "Obtenir la liste des fabricants", description = "Retourne tous les fabricants de bières enregistrés.")
     @GetMapping
     public ResponseEntity<Page<Order>> getOrders(
             @RequestParam(defaultValue = "0") int page,
