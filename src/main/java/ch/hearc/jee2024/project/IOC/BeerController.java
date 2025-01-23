@@ -1,6 +1,9 @@
 package ch.hearc.jee2024.project.IOC;
 
 import ch.hearc.jee2024.project.ServiceBeer.BeerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +29,11 @@ public class BeerController {
         this.beerService = beerService;
     }
 
+    @Operation(summary = "Créer une nouvelle bière", description = "Ajoute une nouvelle bière à la base de données. Nécessite un compte admin.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Bière créée avec succès"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin")
     public ResponseEntity<Beer> createBeer(@RequestBody Beer beer) {
@@ -51,6 +59,7 @@ public class BeerController {
         }
     }
 
+    @Operation(summary = "Obtenir toutes les bières", description = "Retourne la liste de toutes les bières disponibles dans le magasin.")
     @GetMapping
     public ResponseEntity<List<Beer>> getBeers() {
         try {
@@ -62,6 +71,7 @@ public class BeerController {
         }
     }
 
+    @Operation(summary = "Rechercher des bières avec filtres", description = "Permet de rechercher des bières selon plusieurs critères et de paginer les résultats.")
     @GetMapping("/search")
     public ResponseEntity<Page<Beer>> getFilteredBeers(
             @RequestParam(required = false) Integer maxPrice,
@@ -80,7 +90,7 @@ public class BeerController {
         }
     }
 
-
+    @Operation(summary = "Obtenir une bière par ID", description = "Retourne une bière spécifique en fonction de son identifiant unique.")
     @GetMapping("/{id}")
     public ResponseEntity<Beer> getBeerById(@PathVariable int id) {
         try {
@@ -93,6 +103,7 @@ public class BeerController {
         }
     }
 
+    @Operation(summary = "Mettre à jour une bière", description = "Modifie les informations d'une bière existante. Nécessite un compte admin.")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/admin/{id}")
     public ResponseEntity<Beer> updateBeer(@PathVariable int id, @RequestBody Beer beer) {
@@ -108,6 +119,7 @@ public class BeerController {
         }
     }
 
+    @Operation(summary = "Supprimer une bière", description = "Supprime une bière de la base de données. Nécessite un compte admin.")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<Beer> deleteBeer(@PathVariable int id) {
