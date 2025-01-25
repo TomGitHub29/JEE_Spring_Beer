@@ -6,6 +6,7 @@ This project is a simple Spring Boot application that exposes a REST API to mana
 - Clone the project and run the docker-compose.yaml
 ```bash
 git clone https://github.com/TomGitHub29/JEE_Spring_Beer.git
+cd ./JEE_Spring_Beer/
 cd ./dockerrun/
 docker-compose up -d
 ```
