@@ -8,6 +8,9 @@ This project is a simple Spring Boot application that exposes a REST API to mana
 git clone https://github.com/TomGitHub29/JEE_Spring_Beer.git
 cd ./JEE_Spring_Beer/
 cd ./dockerrun/
+```
+- À cette étape, lancer Docker si cela n'est pas déjà fait. Puis:
+```bash
 docker-compose up -d
 ```
 - Get back to project root
